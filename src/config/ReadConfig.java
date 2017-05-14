@@ -100,6 +100,12 @@ public class ReadConfig {
 		return null;
 	}
 	
+	public String getWeatherFile(){
+		if(properties!=null)
+			return properties.getProperty("WeatherFile");
+		return null;
+	}
+	
 	public static void main(String args[]) throws IOException{
 		ReadConfig config = new ReadConfig("config.properties");
 		System.out.println(config.getWeatherWeb());
