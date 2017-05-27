@@ -1,6 +1,7 @@
 package util;
 /**
  * record the info of the current user
+ * a method to record the global variables
  */
 import beans.User;
 

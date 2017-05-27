@@ -5,6 +5,7 @@ public class User {
 	private int id;				// primary key
 	private String userName;	// userName
 	private String password;	// password
+	private int gender;			// 1 represents man, 0 the other
 	private boolean isRoot = false; // whether the user is superUser; 
 	
 	public boolean isRoot(){
@@ -27,6 +28,12 @@ public class User {
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	public boolean getGender(){
+		return gender==1?true:false;
+	}
+	public void setGender(int gender){
+		this.gender=gender;
 	}
 	public boolean getIsRoot(){
 		return isRoot;

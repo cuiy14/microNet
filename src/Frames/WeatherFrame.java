@@ -44,6 +44,7 @@ public class WeatherFrame extends JDialog {
 		this.getContentPane().add(tp);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setBounds(450, 100, 563, 593);
+		this.setVisible(true);
 	}
 
 }

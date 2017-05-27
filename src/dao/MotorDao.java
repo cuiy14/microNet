@@ -61,6 +61,10 @@ public class MotorDao {
 		}
 		return array;
 	}
+	// count
+	public int count(){
+		return selectMotor().size();
+	}
 	// query by id
 	public Motor selectById(int id){
 		Motor motor = new Motor();

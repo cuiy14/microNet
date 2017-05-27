@@ -65,6 +65,10 @@ public class WindMachineDao {
 		}
 		return array;
 	}
+	// do the count
+	public int count(){
+		return selectWindMachine().size();
+	}
 	// query by id
 	public WindMachine selectById(int id){
 		WindMachine wm = new WindMachine();
@@ -72,8 +76,8 @@ public class WindMachineDao {
 		try{
 			String sql = "select * from tb_windMachines where id = " + id;
 			PreparedStatement statement = conn.prepareStatement(sql);
-			ResultSet rest = statement.executeQuery();
-			while(rest.next()){
+			ResultSet rest = statement.executeQuery();	// only one index
+			if(rest.next()){
 				wm.setId(rest.getInt(1));
 				wm.setSerial(rest.getString(2));
 				wm.setNormalPower(rest.getInt(3));
@@ -81,6 +85,7 @@ public class WindMachineDao {
 				wm.setLowWindScale(rest.getInt(5));
 				wm.setHighWindScale(rest.getInt(6));	
 			}
+			else return null;
 		}catch(SQLException e){
 			e.printStackTrace();
 		}

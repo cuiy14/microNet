@@ -63,6 +63,10 @@ public class BatteryDao {
 		}
 		return array;
 	}
+	// count
+	public int count(){
+		return selectBattery().size();
+	}
 	// query by id
 	public Battery selectById(int id){
 		Battery battery = new Battery();

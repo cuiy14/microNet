@@ -3,179 +3,324 @@ package mainFrame;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.GridLayout;
+import java.awt.Label;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import Frames.PersonnelFrame;
+import Frames.SystemFrame;
+import Frames.UtilityFrame;
 import Frames.WeatherFrame;
+import Panels.PersonnelPanel;
+import Panels.WeatherCurve;
+import javafx.scene.image.Image;
+import Frames.EmailFrame;
+import Frames.ForecastFrame;
+
 
 public class MainPage extends JFrame {
-
-	private JPanel jcontentPane;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			UIManager
-					.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainPage frame = new MainPage();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+	JDesktopPane desktop;
+	JMenuBar menuBar;
+	JToolBar toolBar;
+	JPanel content;
+	
+	public MainPage(){
+		super("微电网管理系统");
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setBounds(300,100,800,600);
+		buildContent();
+		buildMenu();
+		buildToolBar();
+		
+		// exit the system when closing
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e){
+				quit();
 			}
 		});
 	}
-	/**
-	 * Create the frame.
-	 */
-	public MainPage() {
-		setForeground(Color.BLACK);
-		setTitle("微电网管理系统");
-		setResizable(false);
-//		setIconImage(Toolkit.getDefaultToolkit().getImage(
-//				MainPage.class.getResource("/imgs/log.png")));
-		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 960, 540);
-		
-		jcontentPane = new JPanel();
-		jcontentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		jcontentPane.setLayout(new BorderLayout(0, 0));
-		setContentPane(jcontentPane);
+	// build the content
+	protected void buildContent(){
+		desktop = new JDesktopPane();
+		desktop.setLayout(new BorderLayout());
+		// build the real time data panel
+		JPanel dataPanel = dataPanel();
+		desktop.add(dataPanel,BorderLayout.WEST);
+		content = new WeatherCurve();
+		desktop.add(content, BorderLayout.CENTER);
+		getContentPane().add(desktop);
+	}
+	// build the dataPanel
+	protected JPanel dataPanel(){
 		/**
-		 *  customize the contentPane
+		 * write a thread, to refresh the number every minute**************************************************
 		 */
-		BackgroundPanel contentPane = new BackgroundPanel();
-		contentPane.setImage(getToolkit().getImage(
-				getClass().getResource("/mainFrame/Background.png")));// 设置背景面板的图片
-		jcontentPane.add(contentPane, BorderLayout.CENTER);// 添加背景面板到内容面板
-		// add the weather button
-		JButton btnWeatherButton = new JButton("");					
-		btnWeatherButton.setIcon(new ImageIcon(MainPage.class
-				.getResource("/mainFrame/buttonW.png")));
-		btnWeatherButton.addActionListener(new ActionListener() {
+		JPanel dataPanel = new JPanel();
+		dataPanel.setBorder(BorderFactory.createEtchedBorder());
+		dataPanel.setBounds(0,30,500,50);
+		dataPanel.setLayout(new GridLayout(8,1));
+		// wind machine
+		Label windOut = new Label("风机总出力");
+		JButton windNum = new JButton("");
+		windNum.setText("123");
+		windNum.setEnabled(false);
+		// photovoltaic
+		Label photoOut = new Label("光伏总出力");
+		JButton photoNum = new JButton("");
+		photoNum.setText("456");
+		photoNum.setEnabled(false);
+		// load
+		Label load = new Label("系统总负荷");
+		JButton loadNum = new JButton("");
+		loadNum.setText("789");
+		loadNum.setEnabled(false);
+		// 总剩余功率
+		Label remain = new Label("净发电功率");
+		JButton remainNum= new JButton("");
+		double renum= Double.parseDouble(windNum.getText())+Double.parseDouble(
+				photoNum.getText())-Double.parseDouble(loadNum.getText());
+		remainNum.setText(Double.toString(renum));
+		remainNum.setEnabled(false);
+		// add the component	
+		dataPanel.add(windOut);
+		dataPanel.add(windNum);
+		dataPanel.add(photoOut);
+		dataPanel.add(photoNum);
+		dataPanel.add(load);
+		dataPanel.add(loadNum);
+		dataPanel.add(remain);
+		dataPanel.add(remainNum);
+		
+		dataPanel.setVisible(true);		
+		return dataPanel;
+	}
+	// build the menubar
+	protected void buildMenu(){
+		menuBar = new JMenuBar();
+//		menuBar.setLayout(new GridLayout(1,2));
+		menuBar.setOpaque(true);
+		// add the administration menu
+		JMenu administration = buildAdministration();
+		menuBar.add(administration);
+		
+		// add the supervision menu
+		JMenu supervision = buildSupervision();
+		menuBar.add(supervision);
+		// set the menubar
+		menuBar.setBorder(BorderFactory.createEtchedBorder());
+		setJMenuBar(menuBar);		
+	}
+	// build the administration menu
+	protected JMenu  buildAdministration(){
+		JMenu administration = new JMenu("管理");
+		JMenuItem personnel = new JMenuItem("人事档案");
+		JMenuItem utility = new JMenuItem("设备档案");
+		// set the shortcuts
+		personnel.setMnemonic('P');
+		personnel.setAccelerator(KeyStroke.getKeyStroke(
+				'P', java.awt.Event.CTRL_MASK,false));
+		personnel.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				new PersonnelFrame();
+			}
+		});
+		utility.setMnemonic('U');
+		utility.setAccelerator(KeyStroke.getKeyStroke(
+				'U', java.awt.Event.CTRL_MASK,false));
+		utility.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new UtilityFrame();			
+			}
+		});
+		// add the components
+		administration.add(personnel);
+		administration.addSeparator();
+		administration.add(utility);
+
+		return administration;
+	}
+
+	// build the supervision menu
+	protected JMenu  buildSupervision(){
+		JMenu supervision = new JMenu("运行");
+		JMenuItem weather = new JMenuItem("天气预报");
+		JMenuItem system = new JMenuItem("系统状态查询");
+		JMenuItem prophet = new JMenuItem("明日预测");
+		// set the shortcuts
+		weather.setMnemonic('W');
+		weather.setAccelerator(KeyStroke.getKeyStroke(
+				'W', java.awt.Event.CTRL_MASK,false));
+		weather.addActionListener(new ActionListener() {			
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					do_btnWeatherButton_actionPerformed(e);
+					new WeatherFrame();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}			
+			}
+		});
+		system.setMnemonic('S');
+		system.setAccelerator(KeyStroke.getKeyStroke(
+				'S', java.awt.Event.CTRL_MASK,false));
+		system.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new SystemFrame();			
+			}
+		});
+		prophet.setMnemonic('F');
+		prophet.setAccelerator(KeyStroke.getKeyStroke(
+				'F', java.awt.Event.CTRL_MASK,false));
+		weather.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new ForecastFrame();			
+			}
+		});
+		supervision.add(weather);
+		supervision.addSeparator();
+		supervision.add(system);
+		supervision.addSeparator();
+		supervision.add(prophet);
+		return supervision;
+	}
+	// build the toolbar
+	protected void buildToolBar(){
+		toolBar= new JToolBar();
+		toolBar.setFloatable(true);
+		/**
+		 *  new icon
+		 */
+		// personnel
+		 JButton btpersonnel = new JButton("");
+		 ImageIcon perIcon = new ImageIcon(MainPage.class.getResource(
+				 "/icon/personnelS.png"));	// relative path
+		 btpersonnel.setIcon(perIcon);
+		 btpersonnel.setSize(10, 10);
+		 btpersonnel.addActionListener(new ActionListener() {		
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TeODO Auto-generated method stub
+				setCenterPanel((new PersonnelPanel()).getPanel());
+			}
+		});
+		 toolBar.add(btpersonnel);
+		 // utility
+		 JButton btmachine = new JButton("");
+		 btmachine.setIcon(new ImageIcon(MainPage.class.getResource("../icon/machineS.png")));
+		 btmachine.addActionListener(new ActionListener() {
+		 	public void actionPerformed(ActionEvent e) {
+		 	}
+		 });
+		 btmachine.setSize(10, 10);
+		 btmachine.addActionListener(new ActionListener() {		
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TeODO Auto-generated method stub
+				new UtilityFrame();
+			}
+		});
+		 toolBar.add(btmachine);
+		 // weather
+		 JButton btweather = new JButton("");
+		 btweather.setIcon(new ImageIcon(MainPage.class.getResource("../icon/weatherS.png")));
+		 btweather.addActionListener(new ActionListener() {
+		 	public void actionPerformed(ActionEvent e) {
+		 	}
+		 });
+		 btweather.setSize(10, 10);
+		 btweather.addActionListener(new ActionListener() {		
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TeODO Auto-generated method stub
+				try {
+					new WeatherFrame();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
 		});
-		btnWeatherButton.setBounds(15, 114, 135, 43);
-		contentPane.add(btnWeatherButton);
-		// add the Email button
-		JButton btnEmailButton = new JButton("");					
-		btnEmailButton.setIcon(new ImageIcon(MainPage.class
-				.getResource("/mainFrame/buttonE.png")));
-		btnEmailButton.addActionListener(new ActionListener() {
+		 toolBar.add(btweather);
+		 // forecast
+		 JButton btforecast = new JButton("");
+		 btforecast.addActionListener(new ActionListener() {
+		 	public void actionPerformed(ActionEvent e) {
+		 	}
+		 });
+		 btforecast.setIcon(new ImageIcon(MainPage.class.getResource("../icon/forecastS.png")));
+		 btforecast.setSize(5, 5);
+		 btforecast.addActionListener(new ActionListener() {		
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				do_btnEmailButton_actionPerformed(e);
+				// TeODO Auto-generated method stub
+				new ForecastFrame();
 			}
 		});
-		btnEmailButton.setBounds(15, 154, 135, 43);
-		contentPane.add(btnEmailButton);
-		// add the Curve button
-		JButton btnCurveButton = new JButton("");					
-		btnCurveButton.setIcon(new ImageIcon(MainPage.class
-				.getResource("/mainFrame/buttonC.png")));
-		btnCurveButton.addActionListener(new ActionListener() {
+		 toolBar.add(btforecast);
+		 // email
+		 JButton btemail = new JButton("");
+		 ImageIcon emaIcon = new ImageIcon(MainPage.class.getResource(
+				 "/icon/emailS.png"));	// relative path
+		 btemail.setIcon(emaIcon);
+		 btemail.setSize(5, 5);
+		 btemail.addActionListener(new ActionListener() {		
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				do_btnCurveButton_actionPerformed(e);
+				// TeODO Auto-generated method stub
+				new EmailFrame();
 			}
 		});
-		btnCurveButton.setBounds(15, 194, 135, 43);
-		contentPane.add(btnCurveButton);
-		// add the Utility button
-		JButton btnUtilityButton = new JButton("");					
-		btnUtilityButton.setIcon(new ImageIcon(MainPage.class
-				.getResource("/mainFrame/buttonU.png")));
-		btnUtilityButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				do_btnUtilityButton_actionPerformed(e);
-			}
-		});
-		btnUtilityButton.setBounds(15, 234, 135, 43);
-		contentPane.add(btnUtilityButton);
-		// add the Personnel button
-		JButton btnPersonnelButton = new JButton("");					
-		btnPersonnelButton.setIcon(new ImageIcon(MainPage.class
-				.getResource("/mainFrame/buttonP.png")));
-		btnPersonnelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				do_btnPersonnelButton_actionPerformed(e);
-			}
-		});
-		btnPersonnelButton.setBounds(15, 274, 135, 43);
-		contentPane.add(btnPersonnelButton);
-		// add the quit button
-		JButton btnQuitButton = new JButton("");					
-		btnQuitButton.setIcon(new ImageIcon(MainPage.class
-				.getResource("/mainFrame/buttonQ.png")));
-		btnQuitButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				do_btnQuitButton_actionPerformed(e);
-			}
-		});
-		btnQuitButton.setBounds(15, 314, 135, 43);
-		contentPane.add(btnQuitButton);
-		/**
-		 * 增加运行监控图
-		 */
-		JPanel supervisePane = new JPanel();
-		supervisePane.setBounds(160, 65, 775, 400);
-		contentPane.add(supervisePane);
+		 toolBar.add(btemail);
+		 desktop.add(toolBar, BorderLayout.NORTH);
+		 
 	}
-
-
+	// things to do when trying to close the main page
+	protected void quit(){
+		String title = "确认窗口";
+		String message="确认退出系统？";
+		int result = JOptionPane.showConfirmDialog(this, message,title,
+				JOptionPane.YES_NO_OPTION,JOptionPane.INFORMATION_MESSAGE);
+		if(result == JOptionPane.YES_OPTION)
+			System.exit(0);			
+	}
+	// set the given Jpanel to the center of contentpanel
+	protected void setCenterPanel(JPanel panel){
+		desktop.remove(content);
+		content = panel;	
+		desktop.add(content,BorderLayout.CENTER);
+		desktop.validate();
+//		this.validate();
+	}
 	
-	/**
-	 * actionListeners
-	 * @param e
-	 * @throws IOException 
-	 */
-	// weather
-	protected void do_btnWeatherButton_actionPerformed(ActionEvent e) throws IOException{
-		WeatherFrame weatherFrame = new WeatherFrame();
-		weatherFrame.setVisible(true);
-	}
-	// Email
-	protected void do_btnEmailButton_actionPerformed(ActionEvent e){
-		
-	}
-	// utility curve
-	protected void do_btnCurveButton_actionPerformed(ActionEvent e){
-		
-	}
-	// utility managements
-	protected void do_btnUtilityButton_actionPerformed(ActionEvent e){
-		
-	}
-	// Personnel managements
-	protected void do_btnPersonnelButton_actionPerformed(ActionEvent e){
-		
-	}
-	// quit the system
-	protected void do_btnQuitButton_actionPerformed(ActionEvent e){
-		
+	public static void main(String args[]){
+		MainPage mainPage = new MainPage();
+		mainPage.setVisible(true);
 	}
 
 }

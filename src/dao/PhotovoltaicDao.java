@@ -63,6 +63,10 @@ public class PhotovoltaicDao {
 		}
 		return array;
 	}
+	// count
+	public int count(){
+		return selectPhotovoltaic().size();
+	}
 	// query by id
 	public Photovoltaic selectById(int id){
 		Photovoltaic photovoltaic = new Photovoltaic();
