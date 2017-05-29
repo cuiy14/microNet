@@ -1,5 +1,7 @@
 package Panels;
-
+/**
+ * for the utility archive frame
+ */
 import static javax.swing.BorderFactory.createTitledBorder;
 import java.awt.Color;
 import java.awt.Font;
@@ -63,7 +65,7 @@ public class BasicWindPanel extends JPanel {
 		this.add(age);
 		
 		time = new JTextField();
-		DateFormat dFormat=new SimpleDateFormat("yyyy-mm-dd");
+		DateFormat dFormat=new SimpleDateFormat("yyyy-MM-dd");
 		this.add(time);
 		this.setBorder(createTitledBorder(null, "基本信息", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.TOP,
 				new Font("sansserif", Font.BOLD, 12), new Color(59, 59, 59)));
@@ -116,7 +118,7 @@ public class BasicWindPanel extends JPanel {
 		this.add(age);
 		
 		time = new JTextField();
-		DateFormat dFormat=new SimpleDateFormat("yyyy-mm-dd");
+		DateFormat dFormat=new SimpleDateFormat("yyyy-MM-dd");
 		time.setText(dFormat.format(wm.getDate()));
 		this.add(time);
 		this.setBorder(createTitledBorder(null, "基本信息", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.TOP,

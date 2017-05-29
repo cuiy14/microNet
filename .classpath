@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="DataSet/" kind="src" path="src"/>
+	<classpathentry kind="src" path="src/DataSet"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JAF 1.1.1"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaMail 1.4.5"/>
@@ -13,5 +14,9 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Commons-logging 1.1.1"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Ezmorph 1.0.6"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Mysql-Connector-java 5.1.42"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JMathArray 1.0"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JRI"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JRIEngine"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/REngine"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

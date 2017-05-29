@@ -137,7 +137,7 @@ public class WindMachineDao {
 		conn = connection.getCon();
 		try{
 			PreparedStatement statement = conn.prepareStatement(
-					"delete * from tb_windMachines where id = " + id);
+					"delete  from tb_windMachines where id = " + id);
 			statement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();

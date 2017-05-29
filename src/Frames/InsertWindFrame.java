@@ -19,9 +19,13 @@ import beans.WindMachine;
 import dao.WindMachineDao;
 
 public class InsertWindFrame extends JFrame{
+	static int count= 14;	// 目前已有的风机数	
 	BasicWindPanel basicWindPanel=new BasicWindPanel();
 	JPanel southPanel= new JPanel();
 	public InsertWindFrame(){
+		count++;
+		basicWindPanel.nameTextField.setText(count+"");
+		basicWindPanel.nameTextField.setEditable(false);
 		this.setLayout(new BorderLayout());
 		this.add(basicWindPanel, BorderLayout.NORTH);
 		JButton insert= new JButton("添加");
@@ -30,7 +34,12 @@ public class InsertWindFrame extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				doInsertion();
+				try {
+					doInsertion();
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		southPanel.add(insert);
@@ -62,7 +71,7 @@ public class InsertWindFrame extends JFrame{
 		String low=basicWindPanel.lowField.getText();
 		String high= basicWindPanel.highField.getText();
 		String time=basicWindPanel.time.getText();
-		if((id==null)||(serial==null)||(power==null)||(low==null)||(high==null)||(time==null)){
+		if((id.equals(""))||(serial.equals(""))||(power.equals(""))||(low.equals(""))||(high.equals(""))||(time.equals(""))){
 			JOptionPane.showMessageDialog(getParent(), "请填充空缺数据", "信息提示框", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
@@ -72,13 +81,12 @@ public class InsertWindFrame extends JFrame{
 		wm.setNormalPower(Integer.parseInt(power));
 		wm.setLowWindScale(Integer.parseInt(low));
 		wm.setHighWindScale(Integer.parseInt(high));
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Date parsed = (Date) format.parse(time);
-        java.sql.Date date= new java.sql.Date(parsed.getTime());
+		Date date= Date.valueOf(time);
 		wm.setDate(date);
 		WindMachineDao wmd=new WindMachineDao();
 		if(wmd.selectById(wm.getId())==null){
 			wmd.insertWindMachine(wm);
+			JOptionPane.showMessageDialog(getParent(), "添加成功！", "信息提示框", JOptionPane.INFORMATION_MESSAGE);
 		}
 		else{
 			JOptionPane.showMessageDialog(getParent(), "该ID已存在，请重新填写", "信息提示框", JOptionPane.INFORMATION_MESSAGE);
@@ -86,9 +94,10 @@ public class InsertWindFrame extends JFrame{
 		}
 	}
 	public void doClose(){
-		this.
+		this.dispose();
 	}
-	public static void main(String args[]) {
-InsertWindFrame insertWindFrame = new InsertWindFrame();
+	public static void main(String args[]) throws ParseException {
+		InsertWindFrame insertWindFrame = new InsertWindFrame();
+
 	}
 }

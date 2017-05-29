@@ -31,15 +31,15 @@ public class MailSend {
 		}
 	}
 	
-	public void SendMessages(String mailTo,String subject, String text){
-		String user = readConfig.getMailFrom(); // get the mail sender
+	public void SendMessages(String user, String password, String mailTo,String subject, String text){
+//		String user = readConfig.getMailFrom(); // get the mail sender
 		String receiver =null;	// get the mail receiver
 		if(mailTo.equals(null))
 			receiver = readConfig.getMailTo();
 		else
 			receiver = mailTo;		  
 		// Get the session object
-		Session session = mailSettings();
+		Session session = mailSettings(user,password);
 		// Compose the message
 		try {
 			MimeMessage message = new MimeMessage(session);
@@ -53,15 +53,16 @@ public class MailSend {
 			message.setText(text);
 			// send the message
 			Transport.send(message);
-			JOptionPane.showMessageDialog(null, "message sent successfully...");
+			JOptionPane.showMessageDialog(null, "邮件发送成功！");
 		} catch (MessagingException e) {
 			e.printStackTrace();
+			// give the warning
+			JOptionPane.showMessageDialog(null, "邮件发送失败！");
 		}  		  
 	}
 	
-	public Session mailSettings() { // some basic mail sending settings
-		String user = readConfig.getMailFrom(); // get the mail sender
-		String password = readConfig.getMailPassword(); // get the password
+	public Session mailSettings(String user, String password)
+	{
 		String host="smtp.gmail.com"; 	// using google mail server
 		String SMTP_PORT = "465";
 		String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
@@ -81,12 +82,17 @@ public class MailSend {
 			    return new PasswordAuthentication(user,password);  
 			      }  
 			    });
-		return session;		
+		return session;	
+	}
+	public Session mailSettings() { // some basic mail sending settings
+		String user = readConfig.getMailFrom(); // get the mail sender
+		String password = readConfig.getMailPassword(); // get the password
+		return mailSettings(user,password);		
 	}
 	
-	public static void main(String args[]) {
-		MailSend mailSend = new MailSend("config.properties");
-		mailSend.SendMessages("thulyang14@163.com","ttt", "echo");
-		
-	}
+//	public static void main(String args[]) {
+//		MailSend mailSend = new MailSend("config.properties");
+//		mailSend.SendMessages("thulyang14@163.com","ttt", "echo");
+//		
+//	}
 }

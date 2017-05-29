@@ -1,5 +1,8 @@
 package Panels;
 
+/**
+ * this implements the utility archive button in the mainPage
+ */
 import static javax.swing.BorderFactory.createTitledBorder;
 
 import java.awt.BorderLayout;
@@ -9,6 +12,8 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -20,10 +25,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.AbstractDocument.Content;
 
 import com.sun.jmx.snmp.tasks.ThreadService;
 
 import Frames.InsertWindFrame;
+import Frames.UpdateWindFrame;
 import beans.WindMachine;
 import dao.BatteryDao;
 import dao.MotorDao;
@@ -39,6 +46,7 @@ public class UtilityPanel2 extends JPanel {
 	private JComboBox idComboBox = new JComboBox();
 	private JRadioButton basic;
 	private JRadioButton history;
+	// private int countId;
 
 	/**
 	 * constructors
@@ -47,7 +55,7 @@ public class UtilityPanel2 extends JPanel {
 		// main border
 		this.setBorder(createTitledBorder(null, "设备管理", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.TOP,
 				new Font("sansserif", Font.BOLD, 12), new Color(59, 59, 59)));
-		setSize(631, 427);
+		// setSize(631, 427);
 		setLayout(new BorderLayout());
 		this.setBackground(new Color(71, 201, 223));
 		// north panel
@@ -65,24 +73,8 @@ public class UtilityPanel2 extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				// init the idComboBox
-				idComboBox.removeAllItems();
-				String uSelectedName = typeComboBox.getSelectedItem().toString(); // get
-																					// the
-																					// selected
-																					// name
-				String searchName = translate(uSelectedName);
-				int count = 0;
-				if (searchName == "WindMachine")
-					count = (new WindMachineDao()).count();
-				else if (searchName == "Photovoltaic")
-					count = (new PhotovoltaicDao()).count();
-				else if (searchName == "Battery")
-					count = (new BatteryDao()).count();
-				else
-					count = (new MotorDao()).count();
-				for (int iter = 0; iter != count; iter++) {
-					idComboBox.addItem(Integer.toString(iter + 1));
-				}
+				String[] idarray = countID();
+				refresh(idarray);
 				repaint();
 				validate();
 			}
@@ -108,7 +100,12 @@ public class UtilityPanel2 extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				doEnquery();
+				try {
+					doEnquery();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		southPanel.add(enquerybt);
@@ -139,11 +136,25 @@ public class UtilityPanel2 extends JPanel {
 			}
 		});
 		southPanel.add(deletebt);
+		JButton refreshbt = new JButton("更新");
+		refreshbt.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				String[] idarray = countID();
+				refresh(idarray);
+				idComboBox.repaint();
+				validate();
+			}
+		});
+		southPanel.add(refreshbt);
 		this.add(southPanel, BorderLayout.SOUTH);
+		centerPanel.setSize(400,300);
 		centerPanel.add(new EmptyPanel());
 		this.add(centerPanel, BorderLayout.CENTER);
 		this.setVisible(true);
 		this.setSize(600, 500);
+		// this.pack();
 		validate();
 	}
 
@@ -151,8 +162,11 @@ public class UtilityPanel2 extends JPanel {
 	 * actionlistener for the buttons
 	 * 
 	 * @return
+	 * @throws IOException
 	 */
-	public void doEnquery() {	//*****************************add the other types; add other search function
+	public void doEnquery() throws IOException { // *****************************add
+													// the other types; add
+													// other search function
 		if (typeComboBox.getSelectedItem() == null) {
 			JOptionPane.showMessageDialog(getParent(), "没有选择查询的设备种类！", "信息提示框", JOptionPane.INFORMATION_MESSAGE);
 			return;
@@ -163,23 +177,29 @@ public class UtilityPanel2 extends JPanel {
 			return;
 		}
 		int idSelected = Integer.parseInt((String) idComboBox.getSelectedItem());
-		if(typeSelected.equals("WindMachine")){
-		if (basic.isSelected()) {
-			centerPanel.remove(centerPanel.getComponent(0));
+		if (typeSelected.equals("WindMachine")) {
+			if (basic.isSelected()) {
+				centerPanel.remove(centerPanel.getComponent(0));
 
-			WindMachineDao windMachineDao = new WindMachineDao();
-			WindMachine wm = windMachineDao.selectById(idSelected);
-			BasicWindPanel basicWindPanel = new BasicWindPanel(wm);
-			centerPanel.add(basicWindPanel);
-			this.validate();
-		} else if (history.isSelected()) {
-			centerPanel.remove(centerPanel.getComponent(0));
-			centerPanel.add(new WeatherCurve());
-			this.validate();
-		} else {
-			JOptionPane.showMessageDialog(getParent(), "没有选择查询类型！", "信息提示框", JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
+				WindMachineDao windMachineDao = new WindMachineDao();
+				WindMachine wm = windMachineDao.selectById(idSelected);
+				BasicWindPanel basicWindPanel = new BasicWindPanel(wm);
+				centerPanel.add(basicWindPanel);
+				this.validate();
+			} else if (history.isSelected()) {
+				centerPanel.remove(centerPanel.getComponent(0));
+				if (typeSelected.equals("WindMachine"))
+					centerPanel.add(new CurvePanel(0));
+				else if (typeSelected.equals("Photovoltaic"))
+					centerPanel.add(new CurvePanel(1));
+				else {
+					centerPanel.add(new CurvePanel(2));
+				}
+				this.validate();
+			} else {
+				JOptionPane.showMessageDialog(getParent(), "没有选择查询类型！", "信息提示框", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
 		}
 	}
 
@@ -189,15 +209,56 @@ public class UtilityPanel2 extends JPanel {
 			return;
 		}
 		String typeSelected = translate((String) typeComboBox.getSelectedItem());
-		if(typeSelected.equals("WindMachine")){
+		if (typeSelected.equals("WindMachine")) {
 			Frame popFrame = new InsertWindFrame();
 		}
 	}
 
 	public void doModify() {
+		if (typeComboBox.getSelectedItem() == null) {
+			JOptionPane.showMessageDialog(getParent(), "没有选择待修改的设备种类！", "信息提示框", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		String typeSelected = translate((String) typeComboBox.getSelectedItem());
+		if (idComboBox.getSelectedItem() == null) {
+			JOptionPane.showMessageDialog(getParent(), "没有选择待修改的设备编号！", "信息提示框", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		int idSelected = Integer.parseInt((String) idComboBox.getSelectedItem());
+		if (typeSelected.equals("WindMachine")) {
+			WindMachineDao wmd = new WindMachineDao();
+			WindMachine wm = wmd.selectById(idSelected);
+			Frame popFrame = new UpdateWindFrame(wm);
+		}
 	}
 
 	public void doDelete() {
+		if (typeComboBox.getSelectedItem() == null) {
+			JOptionPane.showMessageDialog(getParent(), "没有选择待删除的设备种类！", "信息提示框", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		String typeSelected = translate((String) typeComboBox.getSelectedItem());
+		if (idComboBox.getSelectedItem() == null) {
+			JOptionPane.showMessageDialog(getParent(), "没有选择待删除的设备编号！", "信息提示框", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		int idSelected = Integer.parseInt((String) idComboBox.getSelectedItem());
+		if (typeSelected.equals("WindMachine")) {
+			WindMachineDao wmd = new WindMachineDao();
+			wmd.deleteById(idSelected);
+			JOptionPane.showMessageDialog(getParent(), "删除成功！", "信息提示框", JOptionPane.INFORMATION_MESSAGE);
+			try {
+				WindMachine wm = wmd.selectWindMachine().get(0);
+				BasicWindPanel basicWindPanel = new BasicWindPanel(wm);
+				centerPanel.remove(0);
+				centerPanel.add(basicWindPanel);
+				String[] idarray = countID();
+				refresh(idarray);
+				this.validate();
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(getParent(), "该类设备已全部删除！", "信息提示框", JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
 	}
 
 	// translate the chinese into english
@@ -210,6 +271,40 @@ public class UtilityPanel2 extends JPanel {
 			return "Battery";
 		else
 			return "Motor";
+	}
+
+	// count the id range
+	public String[] countID() {
+		String uSelectedName = typeComboBox.getSelectedItem().toString(); // get
+																			// the
+																			// selected
+																			// item
+		String searchName = translate(uSelectedName);
+		int count = (new WindMachineDao()).count();
+		String[] idarray = new String[count];
+		if (searchName == "WindMachine") {
+			ArrayList<WindMachine> wma = (new WindMachineDao()).selectWindMachine();
+			int i = 0;
+			for (i = 0; i != count; i++) {
+				idarray[i] = Integer.toString(wma.get(i).getId());
+			}
+		}
+		return idarray;
+		// else if (searchName == "Photovoltaic")
+		// count = (new PhotovoltaicDao()).count();
+		// else if (searchName == "Battery")
+		// count = (new BatteryDao()).count();
+		// else
+		// count = (new MotorDao()).count();
+	}
+
+	// ID comboBox refresher
+	public void refresh(String[] idarray) {
+		idComboBox.removeAllItems();
+		for (String string : idarray) {
+			idComboBox.addItem(string);
+		}
+		validate();
 	}
 
 	// main

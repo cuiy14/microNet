@@ -1,5 +1,7 @@
 package Panels;
-
+/**
+ * a space holder
+ */
 import javax.swing.JLabel;
 /**
  * this is an empty panel, to fill up some gap

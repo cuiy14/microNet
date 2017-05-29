@@ -27,11 +27,14 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import DynamicInput.AllInput;
+import DynamicInput.WindMachineInput;
 import Frames.PersonnelFrame;
-import Frames.SystemFrame;
 import Frames.UtilityFrame;
 import Frames.WeatherFrame;
 import Panels.PersonnelPanel;
+import Panels.SystemCurvePanel;
+import Panels.UtilityPanel2;
 import Panels.WeatherCurve;
 import javafx.scene.image.Image;
 import Frames.EmailFrame;
@@ -39,34 +42,79 @@ import Frames.ForecastFrame;
 
 
 public class MainPage extends JFrame {
+	int frameWidth=1500;
+	int frameHeight=600;
 	JDesktopPane desktop;
 	JMenuBar menuBar;
 	JToolBar toolBar;
-	JPanel content;
-	
+	JPanel content = new JPanel();
+	JButton windNum = new JButton("");
+	JButton photoNum = new JButton("");
+	JButton loadNum = new JButton("");
+	JButton remainNum= new JButton("");
+//	WindMachineInput wMachineInput= new WindMachineInput(1440);
+	AllInput allInput= new AllInput(1440);
+//	private RefreshThread refreshThread;
 	public MainPage(){
 		super("微电网管理系统");
+		BorderLayout borderLayout = (BorderLayout) getContentPane().getLayout();
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setBounds(300,100,800,600);
-		buildContent();
+		setBounds(300,100,frameWidth,frameHeight);
+		try {
+			buildContent();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		buildMenu();
 		buildToolBar();
-		
+		// the thread to refresh the datapanel
+		Thread refresh=new Thread(){
+			public void run(){
+				// do the below thing  all the time
+				while(true){
+				double windValue= allInput.getWindInput();
+				double photoValue=allInput.getPhotoInput();
+				double loadValue=allInput.getLoadInput();
+				windNum.setText(Double.toString(windValue));
+				photoNum.setText(Double.toString(photoValue));
+				loadNum.setText(Double.toString(loadValue));
+				remainNum.setText(Double.toString(windValue+photoValue-loadValue));
+				try {
+					sleep(1000);
+					System.out.println("sleep over");
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				}
+			}
+		};
+		refresh.start();
 		// exit the system when closing
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e){
 				quit();
 			}
 		});
+		this.setVisible(true);
+		this.pack();
 	}
 	// build the content
-	protected void buildContent(){
+	protected void buildContent() throws IOException{
 		desktop = new JDesktopPane();
+//		desktop.setSize(frameWidth,frameHeight-100);
+		desktop.setSize(700, 600);
 		desktop.setLayout(new BorderLayout());
 		// build the real time data panel
 		JPanel dataPanel = dataPanel();
+		dataPanel.setSize( 50, 500);
 		desktop.add(dataPanel,BorderLayout.WEST);
-		content = new WeatherCurve();
+//		desktop.add(dataPanel);
+		content.add(new SystemCurvePanel());
+		content.setSize(600, 500);
+//		desktop.add(content);
 		desktop.add(content, BorderLayout.CENTER);
 		getContentPane().add(desktop);
 	}
@@ -77,26 +125,23 @@ public class MainPage extends JFrame {
 		 */
 		JPanel dataPanel = new JPanel();
 		dataPanel.setBorder(BorderFactory.createEtchedBorder());
-		dataPanel.setBounds(0,30,500,50);
+//		dataPanel.setBounds(0,30,500,50);
+		dataPanel.setSize(50,500);
 		dataPanel.setLayout(new GridLayout(8,1));
 		// wind machine
 		Label windOut = new Label("风机总出力");
-		JButton windNum = new JButton("");
 		windNum.setText("123");
 		windNum.setEnabled(false);
 		// photovoltaic
 		Label photoOut = new Label("光伏总出力");
-		JButton photoNum = new JButton("");
 		photoNum.setText("456");
 		photoNum.setEnabled(false);
 		// load
 		Label load = new Label("系统总负荷");
-		JButton loadNum = new JButton("");
 		loadNum.setText("789");
 		loadNum.setEnabled(false);
 		// 总剩余功率
 		Label remain = new Label("净发电功率");
-		JButton remainNum= new JButton("");
 		double renum= Double.parseDouble(windNum.getText())+Double.parseDouble(
 				photoNum.getText())-Double.parseDouble(loadNum.getText());
 		remainNum.setText(Double.toString(renum));
@@ -117,12 +162,10 @@ public class MainPage extends JFrame {
 	// build the menubar
 	protected void buildMenu(){
 		menuBar = new JMenuBar();
-//		menuBar.setLayout(new GridLayout(1,2));
 		menuBar.setOpaque(true);
 		// add the administration menu
 		JMenu administration = buildAdministration();
 		menuBar.add(administration);
-		
 		// add the supervision menu
 		JMenu supervision = buildSupervision();
 		menuBar.add(supervision);
@@ -190,7 +233,7 @@ public class MainPage extends JFrame {
 		system.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new SystemFrame();			
+				new UtilityFrame();			
 			}
 		});
 		prophet.setMnemonic('F');
@@ -226,7 +269,7 @@ public class MainPage extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TeODO Auto-generated method stub
-				setCenterPanel((new PersonnelPanel()).getPanel());
+				new PersonnelFrame();
 			}
 		});
 		 toolBar.add(btpersonnel);
@@ -311,11 +354,9 @@ public class MainPage extends JFrame {
 	}
 	// set the given Jpanel to the center of contentpanel
 	protected void setCenterPanel(JPanel panel){
-		desktop.remove(content);
-		content = panel;	
-		desktop.add(content,BorderLayout.CENTER);
-		desktop.validate();
-//		this.validate();
+		content.remove(0);
+		content.add(panel);
+		this.validate();
 	}
 	
 	public static void main(String args[]){
