@@ -77,13 +77,13 @@ public class MainPage extends JFrame {
 				double windValue= allInput.getWindInput();
 				double photoValue=allInput.getPhotoInput();
 				double loadValue=allInput.getLoadInput();
-				windNum.setText(Double.toString(windValue));
-				photoNum.setText(Double.toString(photoValue));
-				loadNum.setText(Double.toString(loadValue));
-				remainNum.setText(Double.toString(windValue+photoValue-loadValue));
+				windNum.setText(String.format("%.2f", windValue));
+				photoNum.setText(String.format("%.2f", photoValue));
+				loadNum.setText(String.format("%.2f", loadValue));
+				remainNum.setText(String.format("%.2f", windValue+photoValue-loadValue));
 				try {
 					sleep(1000);
-					System.out.println("sleep over");
+//					System.out.println("sleep over");
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -104,17 +104,14 @@ public class MainPage extends JFrame {
 	// build the content
 	protected void buildContent() throws IOException{
 		desktop = new JDesktopPane();
-//		desktop.setSize(frameWidth,frameHeight-100);
 		desktop.setSize(700, 600);
 		desktop.setLayout(new BorderLayout());
 		// build the real time data panel
 		JPanel dataPanel = dataPanel();
 		dataPanel.setSize( 50, 500);
 		desktop.add(dataPanel,BorderLayout.WEST);
-//		desktop.add(dataPanel);
 		content.add(new SystemCurvePanel());
 		content.setSize(600, 500);
-//		desktop.add(content);
 		desktop.add(content, BorderLayout.CENTER);
 		getContentPane().add(desktop);
 	}
