@@ -37,13 +37,14 @@ public class WeatherFrame extends JDialog {
 	 */
 	public WeatherFrame() throws IOException {
 		setModal(true);
+		this.setBounds(450, 100, 500, 300);
 		setTitle("天气预报");
 		setResizable(false);
 		tp.add("表格", new WeatherTable());
 		tp.add("曲线", new WeatherCurve());
 		this.getContentPane().add(tp);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setBounds(450, 100, 563, 593);
+
 		this.setVisible(true);
 	}
 

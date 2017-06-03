@@ -7,6 +7,7 @@ import static javax.swing.BorderFactory.createTitledBorder;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridLayout;
@@ -55,13 +56,15 @@ public class UtilityPanel2 extends JPanel {
 		// main border
 		this.setBorder(createTitledBorder(null, "设备管理", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.TOP,
 				new Font("sansserif", Font.BOLD, 12), new Color(59, 59, 59)));
+
 		// setSize(631, 427);
 		setLayout(new BorderLayout());
-		this.setBackground(new Color(71, 201, 223));
+		this.setBackground(new Color(23,119,178));
 		// north panel
-		northPanel.setBackground(new Color(71, 201, 223));
+		northPanel.setBackground(new Color(23,119,178));
 		northPanel.setBorder(BorderFactory.createTitledBorder(null, "设备信息", TitledBorder.DEFAULT_JUSTIFICATION,
 				TitledBorder.ABOVE_TOP, new Font("sansserif", Font.BOLD, 12), new Color(59, 59, 59)));
+
 		northPanel.setLayout(new GridLayout(1, 4));
 		JLabel typeLabel = new JLabel("种类：");
 		northPanel.add(typeLabel);
@@ -179,8 +182,8 @@ public class UtilityPanel2 extends JPanel {
 		int idSelected = Integer.parseInt((String) idComboBox.getSelectedItem());
 		if (typeSelected.equals("WindMachine")) {
 			if (basic.isSelected()) {
-				centerPanel.remove(centerPanel.getComponent(0));
-
+				centerPanel.remove(0);
+				centerPanel.setLayout(new FlowLayout());
 				WindMachineDao windMachineDao = new WindMachineDao();
 				WindMachine wm = windMachineDao.selectById(idSelected);
 				BasicWindPanel basicWindPanel = new BasicWindPanel(wm);
@@ -189,11 +192,18 @@ public class UtilityPanel2 extends JPanel {
 			} else if (history.isSelected()) {
 				centerPanel.remove(centerPanel.getComponent(0));
 				if (typeSelected.equals("WindMachine"))
-					centerPanel.add(new CurvePanel(0));
+				{
+					centerPanel.setLayout(new BorderLayout());
+					centerPanel.add(new CurvePanel(0),BorderLayout.CENTER);
+				}
 				else if (typeSelected.equals("Photovoltaic"))
-					centerPanel.add(new CurvePanel(1));
+				{
+					centerPanel.setLayout(new BorderLayout());
+					centerPanel.add(new CurvePanel(1),BorderLayout.CENTER);
+				}
 				else {
-					centerPanel.add(new CurvePanel(2));
+						centerPanel.setLayout(new BorderLayout());
+						centerPanel.add(new CurvePanel(2),BorderLayout.CENTER);
 				}
 				this.validate();
 			} else {

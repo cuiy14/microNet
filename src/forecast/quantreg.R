@@ -27,6 +27,6 @@ return (coeff)
 #     main = "不同分位点拟合曲线的比较")
 #lines(fitted(fit1),lwd=2, col = "#FF00FF")
 #lines(fitted(fit2),lwd=2, col = "#EEEE00")
-#legend("topleft", c("tau=.05","tau=.50","tau=.95"), lty=c(1,1),
+#legend("topleft", c("tau=.25","tau=.50","tau=.75"), lty=c(1,1),
 #       col=c( "#FF00FF","#EEEE00","#EE6363"))
 }

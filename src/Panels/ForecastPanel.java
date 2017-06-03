@@ -6,6 +6,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -74,11 +76,11 @@ public class ForecastPanel extends JPanel{
 		northPanel.add(guide);
 		// south panel
 		southPanel.add(new EmptyPanel());
-		southPanel.setSize(600, 500);
+		southPanel.setSize(500,400);
 		// the whole
 		this.setLayout(new BorderLayout());
 		this.add(northPanel, BorderLayout.NORTH);
-		this.add(southPanel, BorderLayout.SOUTH);
+		this.add(southPanel, BorderLayout.CENTER);
 		this.setVisible(true);		
 	}
 	// action listener
@@ -103,7 +105,7 @@ public class ForecastPanel extends JPanel{
 				substitute((new RecordPanel("photo",ti)).createPanel());
 			}
 			else if(ti==0){
-				substitute(new PhotoFuturePanel(1));
+				substitute((new PhotoFuturePanel(1)).createPanel());
 			}
 		}
 		else {
@@ -113,7 +115,8 @@ public class ForecastPanel extends JPanel{
 	// substitute the southPanel content
 	public void substitute(JPanel panel){
 		southPanel.remove(0);
-		southPanel.add(panel);
+		southPanel.setLayout(new BorderLayout());
+		southPanel.add(panel,BorderLayout.CENTER);
 		validate();
 	}
 	public void doGuide(){
@@ -121,8 +124,11 @@ public class ForecastPanel extends JPanel{
 		double photoSum= getPhotoSum();
 		double loadSum= getLoadSum();
 		double difference=windSum+photoSum-loadSum;
-		String message = "据预计\n明天风电出力"+windSum+"kwh\n光伏出力"+photoSum+"kwh\n负荷消耗"+
-		loadSum+"kwh\n "+"本微电网净发电出力为"+difference+"kwh。\n请提前做好设备管理与运行负荷调控。";
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+		String message = "据预计\n明天风电出力"+String.format("%.2f", windSum)+"kwh\n光伏出力"+
+		String.format("%.2f", photoSum)+"kwh\n负荷消耗"+
+		String.format("%.2f", loadSum)+"kwh\n "+"本微电网净发电出力为"+String.format("%.2f", difference)+
+		"kwh。\n请提前做好设备管理与运行负荷调控。\n"+df.format(new Date());
 		String subject="微电网运行指导";
 		EmailFrame emailFrame=new EmailFrame();
 		emailFrame.setMessage(message);

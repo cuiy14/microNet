@@ -34,10 +34,12 @@ import Frames.UtilityFrame;
 import Frames.WeatherFrame;
 import Panels.PersonnelPanel;
 import Panels.SystemCurvePanel;
+import Panels.SystemCurvePanel2;
 import Panels.UtilityPanel2;
 import Panels.WeatherCurve;
 import javafx.scene.image.Image;
 import Frames.EmailFrame;
+import Frames.EmailFrame2;
 import Frames.ForecastFrame;
 
 
@@ -110,7 +112,7 @@ public class MainPage extends JFrame {
 		JPanel dataPanel = dataPanel();
 		dataPanel.setSize( 50, 500);
 		desktop.add(dataPanel,BorderLayout.WEST);
-		content.add(new SystemCurvePanel());
+		content.add(new SystemCurvePanel2());
 		content.setSize(600, 500);
 		desktop.add(content, BorderLayout.CENTER);
 		getContentPane().add(desktop);
@@ -176,9 +178,9 @@ public class MainPage extends JFrame {
 		JMenuItem personnel = new JMenuItem("人事档案");
 		JMenuItem utility = new JMenuItem("设备档案");
 		// set the shortcuts
-		personnel.setMnemonic('P');
+		personnel.setMnemonic('1');
 		personnel.setAccelerator(KeyStroke.getKeyStroke(
-				'P', java.awt.Event.CTRL_MASK,false));
+				'1', java.awt.Event.CTRL_MASK,false));
 		personnel.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -186,9 +188,9 @@ public class MainPage extends JFrame {
 				new PersonnelFrame();
 			}
 		});
-		utility.setMnemonic('U');
+		utility.setMnemonic('2');
 		utility.setAccelerator(KeyStroke.getKeyStroke(
-				'U', java.awt.Event.CTRL_MASK,false));
+				'2', java.awt.Event.CTRL_MASK,false));
 		utility.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -207,12 +209,12 @@ public class MainPage extends JFrame {
 	protected JMenu  buildSupervision(){
 		JMenu supervision = new JMenu("运行");
 		JMenuItem weather = new JMenuItem("天气预报");
-		JMenuItem system = new JMenuItem("系统状态查询");
-		JMenuItem prophet = new JMenuItem("明日预测");
+		JMenuItem system = new JMenuItem("运行指导");
+		JMenuItem prophet = new JMenuItem("系统提醒");
 		// set the shortcuts
-		weather.setMnemonic('W');
+		weather.setMnemonic('3');
 		weather.setAccelerator(KeyStroke.getKeyStroke(
-				'W', java.awt.Event.CTRL_MASK,false));
+				'3', java.awt.Event.CTRL_MASK,false));
 		weather.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -224,22 +226,22 @@ public class MainPage extends JFrame {
 				}			
 			}
 		});
-		system.setMnemonic('S');
+		system.setMnemonic('4');
 		system.setAccelerator(KeyStroke.getKeyStroke(
-				'S', java.awt.Event.CTRL_MASK,false));
+				'4', java.awt.Event.CTRL_MASK,false));
 		system.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new UtilityFrame();			
+				new ForecastFrame();			
 			}
 		});
-		prophet.setMnemonic('F');
+		prophet.setMnemonic('5');
 		prophet.setAccelerator(KeyStroke.getKeyStroke(
-				'F', java.awt.Event.CTRL_MASK,false));
-		weather.addActionListener(new ActionListener() {			
+				'5', java.awt.Event.CTRL_MASK,false));
+		prophet.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new ForecastFrame();			
+				new EmailFrame2();			
 			}
 		});
 		supervision.add(weather);
@@ -333,7 +335,7 @@ public class MainPage extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TeODO Auto-generated method stub
-				new EmailFrame();
+				new EmailFrame2();
 			}
 		});
 		 toolBar.add(btemail);

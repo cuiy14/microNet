@@ -14,6 +14,8 @@ import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.omg.CORBA.FREE_MEM;
 
+import beans.TimeSlice;
+
 public class AllInput {
 	static private String pathWind = "/home/drift/Documents/eclipseMars/microNet/src/DataSet/WindHistory.csv";
 	static private String pathPhoto="/home/drift/Documents/eclipseMars/microNet/src/DataSet/photoHistory.csv";
@@ -70,7 +72,12 @@ public class AllInput {
 		return seriesWind.elementAt(index);
 	}
 	public static double getPhotoInput(){
-		return seriesPhoto.elementAt(index);
+		TimeSlice timeSlice= new TimeSlice();
+//		int minute = timeSlice.getCurrentMinute();		// virtual input
+//		int virtual= (minute+index)%1440;
+		int virtual=(430+index)%1440;
+//		System.out.println("virturl" + virtual);
+		return seriesPhoto.elementAt(virtual);	
 	}
 	public static double getLoadInput(){
 		return seriesLoad.elementAt(index);
@@ -80,7 +87,8 @@ public class AllInput {
 
 		public void actionPerformed(ActionEvent actionevent) {
 			double value = seriesWind.get(index);
-			double value2=seriesPhoto.get(index);
+//			double value2=seriesPhoto.get(index);
+			double value2 = seriesPhoto.get((430+index)%1440);
 			double value3 = seriesLoad.get(index);
 			windGeneration.add(new Millisecond(), value);
 			photoGeneration.add(new Millisecond(), value2);
@@ -101,12 +109,12 @@ public class AllInput {
 
 	// test
 	public static void main(String args[]) {
-		WindMachineInput windMachineInput = new WindMachineInput(1440);
+		AllInput input=new AllInput(1440);
 		double value=0;
 		 while(true){
-			 if(value!=windMachineInput.realtimeInput()){
-				 value=windMachineInput.realtimeInput();
-				 System.out.println(windMachineInput.realtimeInput()); 
+			 if(value!=input.getPhotoInput()){
+				 value=input.getPhotoInput();
+				 System.out.println(input.getPhotoInput()); 
 			 }
 		 }
 

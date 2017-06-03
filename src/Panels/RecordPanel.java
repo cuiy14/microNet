@@ -97,7 +97,7 @@ public class RecordPanel extends JPanel{
 		// create the chart
 		JFreeChart chart= ChartFactory.createXYLineChart(
 				title, 
-				"时间点/小时",
+				"时间点/分钟",
 				"负荷水平", 
 				(XYDataset) dataset,
 				PlotOrientation.VERTICAL,
@@ -124,7 +124,9 @@ public class RecordPanel extends JPanel{
 	// 
 	public JPanel createPanel() throws IOException {
 	JFreeChart chart = createChart(createDataset(type, time));
-	return new ChartPanel(chart);
+	JPanel pp= new ChartPanel(chart);
+//	pp.setSize(500,350);
+	return pp;
 	}
 	
 	public static void main(String args[]) throws IOException{

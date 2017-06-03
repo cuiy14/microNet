@@ -1,4 +1,5 @@
 package Panels;
+import java.awt.BorderLayout;
 /**
  * the panel for forecasting photovoltaic using R
  * put into the forecast frame
@@ -7,6 +8,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -30,25 +32,36 @@ import org.rosuda.JRI.Rengine;
 public class PhotoFuturePanel extends JPanel{
 	String 	path="/home/drift/Documents/eclipseMars/microNet/src/DataSet/photoHistory.csv";
 	public double [] coef;
+	int dayd=0;
 	/**
 	 * constructors
 	 */
 	public PhotoFuturePanel(int day){
+		dayd=day;
 		coef=j2i(day);
 		XYDataset xydataset = createDataset(coef);
         JFreeChart jfreechart = createChart(xydataset);
         ChartPanel chartpanel = new ChartPanel(jfreechart);
 //        chartpanel.setPreferredSize(new Dimension(500, 270));
 //        setContentPane(chartpanel);
-        this.add(chartpanel);
+        this.add(chartpanel,BorderLayout.CENTER);
+        this.setSize(300, 200);		//reset the size***
         this.setVisible(true);
 	}
+	// return the panel 	
+	//***************************** attention : put the chart in a single panel, and return it,this can automatically resize it
+	public JPanel createPanel() {	
+		JFreeChart chart = createChart(createDataset(j2i(dayd)));
+		JPanel pp= new ChartPanel(chart);
+//		pp.setSize(500,350);
+		return pp;
+		}
 	/**
 	 * create the dataset with the data file & the coef
 	 */
 	public XYDataset createDataset( double[] coef){
-        TimeSeries timeseries = new TimeSeries("下5%分位数");
-        TimeSeries timeseries1 = new TimeSeries("下95%分位数");
+        TimeSeries timeseries = new TimeSeries("下25%分位数");
+        TimeSeries timeseries1 = new TimeSeries("下75%分位数");
         Minute minute = new Minute(0, 0, 1, 1, 2017);
         // do the dataset
         int count=0;

@@ -4,10 +4,13 @@ package Frames;
  * need to imporve -- once got wrong , it won't work any more except for a new Frame
  */
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -25,17 +28,19 @@ import javafx.scene.layout.Border;
 import util.MailSend;
 
 public class EmailFrame extends JFrame{
+	static int send=0;		// record the mails sent
 //	MailSend mailSend;
 	JPanel northPanel=new JPanel();
 	JPanel centerPanel=new JPanel();
 	JPanel southPanel=new JPanel();
 	JPanel contentPanel=new JPanel();
-	JTextField textAd;
-	JPasswordField textPs;
-	JTextField textTo;
-	JTextField textSub;
-	JTextArea textMes;
+	static JTextField textAd;
+	static JPasswordField textPs;
+	static JTextField textTo;
+	static JTextField textSub;
+	static JTextArea textMes;
 	public EmailFrame(){
+		this.setBackground(new Color(23,119,178));
 		int distance=30;
 //		mailSend = new MailSend("config.properties");
 		contentPanel.setLayout(new BorderLayout());
@@ -101,7 +106,7 @@ public class EmailFrame extends JFrame{
 		this.validate();
 	}
 	// action listener
-	public void SendMessages(){
+	public static  void SendMessages(){
 		String user = textAd.getText();
 		String password= new String(textPs.getPassword());
 		String mailTo=textTo.getText();
@@ -110,6 +115,7 @@ public class EmailFrame extends JFrame{
 		System.out.println(password);
 		MailSend mailSend = new MailSend("config.properties");
 		mailSend.SendMessages(user, password, mailTo, subject, text);
+		send++;
 	}
 	
 	// set the default message
@@ -117,7 +123,8 @@ public class EmailFrame extends JFrame{
 		textAd.setText("cuiy379@gmail.com");
 		textTo.setText("18813119878@163.com");
 		textSub.setText("微电网信息日常提醒");
-		textMes.setText("微电网运行一切正常！");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+		textMes.setText("微电网运行一切正常！\n"+df.format(new Date()));
 	}
 	public void setMessage(String message){
 		textMes.setText(message);

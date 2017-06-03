@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,7 +18,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-
 import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import beans.User;
@@ -27,9 +27,11 @@ import util.Session;
 
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.ActionEvent;
 
-public class Login extends JFrame {
+public class Login extends JFrame implements KeyListener {
 
 	private BackgroundPanel contentPane;
 	private JTextField userNameTextField;
@@ -95,29 +97,55 @@ public class Login extends JFrame {
 			contentPane.add(passWordLabel);
 			passwordField = new JPasswordField();
 			passwordField.setBounds(177, 153, 139, 25);
+			passwordField.addKeyListener(this);
 			contentPane.add(passwordField);
 
 			JButton btnQue = new JButton("确认");
 			btnQue.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					UserDao userDao = new UserDao(); // 创建保存有操作数据库类对象
-					User user = userDao.getUser(userNameTextField.getText(), new String(passwordField.getPassword())); // 以用户添加的用户名与密码为参数调用查询用户方法
-					if (user.getId() > 0) { // 判断用户编号是否大于0
-						Session.setUser(user); // 设置Session对象的User属性值
-						MainPage mainPage = new MainPage(); // 创建主窗体对象
-						mainPage.setVisible(true); // 显示主窗体
-						Login.this.dispose(); // 销毁登录窗体
-					} else { // 如果用户输入的用户名与密码错误
-						JOptionPane.showMessageDialog(getContentPane(), "用户名或密码错误"); // 给出提示信息
-						userNameTextField.setText(""); // 用户名文本框设置为空
-						passwordField.setText(""); // 密码文本框设置为空
-					}
-
+					doEnter();
 				}
 			});
 			btnQue.setBounds(177, 190, 102, 28);
 			contentPane.add(btnQue);
 		}
 		return contentPane;
+	}
+
+	// the actions to do after enter
+	void doEnter() {
+		UserDao userDao = new UserDao(); // 创建保存有操作数据库类对象
+		ArrayList<User> arrayList = userDao.selectUser();
+		for (User user : arrayList) {
+			if (user.getIsRoot())
+				Session.setSudo(user.getPassword());
+		}
+		User user = userDao.getUser(userNameTextField.getText(), new String(passwordField.getPassword())); // 以用户添加的用户名与密码为参数调用查询用户方法
+		if (user.getId() > 0) { // 判断用户编号是否大于0
+			Session.setUser(user); // 设置Session对象的User属性值
+			MainPage mainPage = new MainPage(); // 创建主窗体对象
+			mainPage.setVisible(true); // 显示主窗体
+			Login.this.dispose(); // 销毁登录窗体
+		} else { // 如果用户输入的用户名与密码错误
+			JOptionPane.showMessageDialog(getContentPane(), "用户名或密码错误"); // 给出提示信息
+			userNameTextField.setText(""); // 用户名文本框设置为空
+			passwordField.setText(""); // 密码文本框设置为空
+		}
+	}
+
+	// key listener
+	public void keyPressed(KeyEvent e) {
+		if (e.getSource() == passwordField) {
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) // 判断按下的键是否是回车键
+			{
+				doEnter();
+			}
+		}
+	}
+
+	public void keyReleased(KeyEvent e) {
+	}
+
+	public void keyTyped(KeyEvent e) {
 	}
 }
