@@ -19,7 +19,9 @@ import beans.WindMachine;
 import dao.WindMachineDao;
 
 public class InsertWindFrame extends JFrame{
-	static int count= 14;	// 目前已有的风机数	
+//	static int count= 14;	// 目前已有的风机数	
+	WindMachineDao windMachineDao= new WindMachineDao();
+	int count=windMachineDao.getMaxId();
 	BasicWindPanel basicWindPanel=new BasicWindPanel();
 	JPanel southPanel= new JPanel();
 	public InsertWindFrame(){

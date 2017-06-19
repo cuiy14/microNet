@@ -112,6 +112,8 @@ public class EmailFrame extends JFrame{
 		String mailTo=textTo.getText();
 		String subject= textSub.getText();
 		String text=textMes.getText();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+		text=text+df.format(new Date());
 		System.out.println(password);
 		MailSend mailSend = new MailSend("config.properties");
 		mailSend.SendMessages(user, password, mailTo, subject, text);
@@ -123,8 +125,9 @@ public class EmailFrame extends JFrame{
 		textAd.setText("cuiy379@gmail.com");
 		textTo.setText("18813119878@163.com");
 		textSub.setText("微电网信息日常提醒");
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
-		textMes.setText("微电网运行一切正常！\n"+df.format(new Date()));
+//		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+//		textMes.setText("微电网运行一切正常！\n"+df.format(new Date()));
+		textMes.setText("微电网运行一切正常!\n");
 	}
 	public void setMessage(String message){
 		textMes.setText(message);

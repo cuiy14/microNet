@@ -69,6 +69,15 @@ public class WindMachineDao {
 	public int count(){
 		return selectWindMachine().size();
 	}
+	// get the maximum id
+	public int getMaxId(){
+		ArrayList<WindMachine> wms=selectWindMachine();
+		int max=0;
+		for(WindMachine wm:wms){
+			max = max>wm.getId()? max:wm.getId();
+		}
+		return max;
+	}
 	// query by id
 	public WindMachine selectById(int id){
 		WindMachine wm = new WindMachine();
